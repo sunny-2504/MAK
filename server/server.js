@@ -6,7 +6,8 @@ const upload = multer();
 var Data = require('./data.js');
 const csv=require('csvtojson')
 const fs= require('fs');
-
+var cors = require('cors')
+app.use(cors())
 // run on port 4000
 var port = 4000;
 app.listen(port, function () {
@@ -26,11 +27,14 @@ app.post('/upload', upload.single('csvFile'), async (req, res) => {
     const csvData = req.file.buffer.toString()
     console.log(csvData)
     csv()
-        .fromFile(req.file.path)
+        .fromString(csvData)
         .then((jsonObj)=>{
-            console.log(typeof jsonObj);
-            res.send(jsonObj);
+            const ID = jsonObj[0].ID
+            const CSVdata = []
+            
+            res.json({data : jsonObj, message : 'success'});
         })
+        
 
     
 });
