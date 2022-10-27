@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var dataSchema = new Schema({
     ID : String,
-    CSVdata: Array
+    CSVdata: Object
 });
 var Data = mongoose.model('Data', dataSchema);
 module.exports = Data;

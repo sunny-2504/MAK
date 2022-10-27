@@ -15,7 +15,7 @@ app.listen(port, function () {
 });
 
 // connect to database
-mongoose.connect('mongodb+srv://admin:sunny007@cluster0.hu9tcgq.mongodb.net/?retryWrites=true&w=majority/MAK', function (err) {
+mongoose.connect('mongodb+srv://admin:sunny007@cluster0.hu9tcgq.mongodb.net/?retryWrites=true&w=majority', function (err) {
     if (err) {
         console.log('Error connecting to database');
     } else {
@@ -25,17 +25,30 @@ mongoose.connect('mongodb+srv://admin:sunny007@cluster0.hu9tcgq.mongodb.net/?ret
 
 app.post('/upload', upload.single('csvFile'), async (req, res) => {
     const csvData = req.file.buffer.toString()
-    console.log(csvData)
     csv()
         .fromString(csvData)
         .then((jsonObj)=>{
             const ID = jsonObj[0].ID
-            const CSVdata = []
-            
-            res.json({data : jsonObj, message : 'success'});
+            const CSVdata = {}
+            delete jsonObj[0].ID
+            for (const key in jsonObj[0]) {
+                CSVdata[key] = jsonObj[0][key]
+            }
+            const data = new Data({
+                ID,
+                CSVdata
+            })
+            data.save().then(
+            res.json({data : CSVdata, message : 'success'}))
         })
         
 
     
 });
+
+app.post('/get', upload.none(), async (req, res) => {
+    const ID = req.body.ID
+    const data = await Data.findOne({ID})
+    res.json({data : data.CSVdata, message : 'success'})
+})
 
